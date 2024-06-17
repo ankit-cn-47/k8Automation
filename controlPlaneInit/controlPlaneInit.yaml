@@ -40,4 +40,4 @@
 
     - name: Apply Calico network
       command: kubectl apply -f /home/{{ ansible_user }}/calico.yaml
-      become: true
+      become: false
