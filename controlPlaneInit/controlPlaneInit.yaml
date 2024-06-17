@@ -35,7 +35,7 @@
       become: true
 
     - name: Change ownership of kubeconfig
-      command: sudo chown $(id -u {{ ansible_user }}):$(id -g {{ ansible_user }}) /home/{{ ansible_user }}/.kube/config
+      command: sudo chown {{ ansible_user }:{{ ansible_user }} /home/{{ ansible_user }}/.kube/config
       become: true
 
     - name: Apply Calico network
