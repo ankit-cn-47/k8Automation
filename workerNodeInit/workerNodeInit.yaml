@@ -95,15 +95,14 @@
           - kubectl=1.29.1-1.1
         state: present
 
-    - name: Hold Kubernetes packages
-      apt:
-        name:
-          - kubelet
-          - kubeadm
-          - kubectl
-          - containerd
-        state: present
-        update_cache: yes
-        force: yes
-        allow_change_held_packages: yes
-        hold: yes
+    - name: Hold kubelet package
+      shell: apt-mark hold kubelet
+
+    - name: Hold kubeadm package
+      shell: apt-mark hold kubeadm
+
+    - name: Hold kubectl package
+      shell: apt-mark hold kubectl
+
+    - name: Hold containerd package
+      shell: apt-mark hold containerd
