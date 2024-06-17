@@ -1,6 +1,6 @@
 ---
 - name: Configure worker node for Kubernetes
-  hosts: worker_nodes
+  hosts: all
   become: yes
 
   tasks:
