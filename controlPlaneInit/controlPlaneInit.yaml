@@ -22,6 +22,17 @@
     - name: Initialize Kubernetes cluster
       command: kubeadm init --kubernetes-version v1.29.1
 
+    - name: Create a .kube directory for user
+      become: yes
+      tasks:
+        - name: Create a directory
+          file:
+            path: /home/{{ ansible_user }}/.kube
+            state: directory
+            owner: {{ ansible_user }}
+            group: {{ ansible_user }}
+            mode: '0755'
+
     - name: Copy kubeconfig to user directory
       command: sudo cp -i /etc/kubernetes/admin.conf /home/{{ ansible_user }}/.kube/config
       become: true
