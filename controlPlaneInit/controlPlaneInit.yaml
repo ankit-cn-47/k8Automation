@@ -1,0 +1,35 @@
+---
+- name: Set up Kubernetes Master with Calico Networking
+  hosts: all
+  vars:
+    ansible_user: "cn47"
+  become: true
+  tasks:
+    - name: Ensure required directories exist
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      with_items:
+        - "$HOME/.kube"
+
+    - name: Download Calico YAML
+      get_url:
+        url: https://raw.githubusercontent.com/projectcalico/calico/master/manifests/calico.yaml
+        dest: /home/{{ ansible_user }}/calico.yaml
+      become: false
+
+    - name: Initialize Kubernetes cluster
+      command: kubeadm init --kubernetes-version v1.29.1
+
+    - name: Copy kubeconfig to user directory
+      command: sudo cp -i /etc/kubernetes/admin.conf /home/{{ ansible_user }}/.kube/config
+      become: true
+
+    - name: Change ownership of kubeconfig
+      command: sudo chown $(id -u {{ ansible_user }}):$(id -g {{ ansible_user }}) /home/{{ ansible_user }}/.kube/config
+      become: true
+
+    - name: Apply Calico network
+      command: kubectl apply -f /home/{{ ansible_user }}/calico.yaml
+      become: true

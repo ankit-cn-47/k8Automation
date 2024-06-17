@@ -1,0 +1,26 @@
+# This is the network config written by 'subiquity'
+network:
+  version: 2
+  ethernets:
+    enp0s3: #This is your network adapter attached to NAT
+      dhcp4: true
+      routes:
+        - to: default
+          via: 10.0.2.4
+      nameservers:
+        addresses: #Below I chose to use google as the DNS servers. You can choose other DNS servers if you'd like.
+          - 8.8.8.8
+          - 8.8.4.4
+    enp0s8: #This is your network adapter attached to Host-only
+      dhcp4: no
+      addresses:
+        - 192.168.56.10/24 #This is the static IP change for each machine.
+      routes:
+        - to: default
+          via: 192.168.56.1
+          metric: "50"
+      nameservers:
+        addresses:
+          - 192.168.1.200
+
+

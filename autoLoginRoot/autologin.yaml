@@ -1,0 +1,77 @@
+---
+- name: Configure Ubuntu system for auto login as root without password
+  hosts: target_host
+  become: true
+
+  tasks:
+    - name: Install lightdm
+      apt:
+        name: lightdm
+        state: present
+        update_cache: yes
+
+    - name: Ensure the lightdm directory exists
+      file:
+        path: /etc/lightdm
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Configure lightdm for auto login
+      blockinfile:
+        path: /etc/lightdm/lightdm.conf
+        block: |
+          [SeatDefaults]
+          autologin-user=root
+          autologin-user-timeout=0
+          autologin-session=lightdm-autologin
+
+    - name: Ensure the systemd service override directory exists
+      file:
+        path: /etc/systemd/system/getty@tty1.service.d
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Configure systemd to auto login as root on tty1
+      blockinfile:
+        path: /etc/systemd/system/getty@tty1.service.d/override.conf
+        block: |
+          [Service]
+          ExecStart=
+          ExecStart=-/sbin/agetty --autologin root --noclear %I $TERM
+
+    - name: Disable password for root login
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PermitRootLogin'
+        line: 'PermitRootLogin yes'
+        state: present
+
+    - name: Restart SSH service to apply changes
+      service:
+        name: ssh
+        state: restarted
+
+    - name: Disable the lock screen
+      blockinfile:
+        path: /etc/lightdm/lightdm.conf
+        block: |
+          [Seat:*]
+          greeter-session=lightdm-gtk-greeter
+          greeter-hide-users=true
+          greeter-show-manual-login=true
+          allow-guest=false
+          user-session=ubuntu
+          autologin-user=root
+          autologin-user-timeout=0
+
+    - name: Reboot the system to apply changes
+      reboot:
+        msg: "Rebooting to apply auto login configuration"
+        connect_timeout: 5
+        reboot_timeout: 600
+        pre_reboot_delay: 5
+        post_reboot_delay: 30
