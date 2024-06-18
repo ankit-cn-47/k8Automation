@@ -3,6 +3,7 @@
   hosts: all
   vars:
     ansible_user: "osboxes"
+    default_gateway: "192.168.56.12"
   become: true
   tasks:
     - name: Ensure required directories exist
@@ -20,7 +21,7 @@
       become: false
 
     - name: Initialize Kubernetes cluster
-      command: kubeadm init --kubernetes-version v1.29.1
+      command: kubeadm init --kubernetes-version v1.29.1 --apiserver-advertise-address={{default_gateway}}
 
     - name: Create a .kube directory for user
       file:
