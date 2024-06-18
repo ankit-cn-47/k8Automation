@@ -2,7 +2,7 @@
 - name: Set up Kubernetes Master with Calico Networking
   hosts: all
   vars:
-    ansible_user: "cn47"
+    ansible_user: "osboxes"
   become: true
   tasks:
     - name: Ensure required directories exist
