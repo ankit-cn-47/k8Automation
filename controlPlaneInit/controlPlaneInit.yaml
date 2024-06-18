@@ -14,12 +14,6 @@
       with_items:
         - "$HOME/.kube"
 
-    - name: Download Calico YAML
-      get_url:
-        url: https://raw.githubusercontent.com/projectcalico/calico/master/manifests/calico.yaml
-        dest: /home/{{ ansible_user }}/calico.yaml
-      become: false
-
     - name: Initialize Kubernetes cluster
       command: kubeadm init --kubernetes-version v1.29.1 --apiserver-advertise-address={{default_gateway}}
 
@@ -40,5 +34,5 @@
       become: true
 
     - name: Apply Calico network
-      command: kubectl apply -f /home/{{ ansible_user }}/calico.yaml
+      command: kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.28.0/manifests/tigera-operator.yaml
       become: false
