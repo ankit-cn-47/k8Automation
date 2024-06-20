@@ -74,16 +74,19 @@
         - curl
         - gpg
 
-    - name: Add Google's apt repository gpg key
-      command: curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+    - name: Add Kubernetes GPG key
+      apt_key:
+        url: https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key
+        state: present
+        keyring: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
-    - name: Add the Kubernetes apt repository
-      copy:
-        content: |
-          deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /
-        dest: /etc/apt/sources.list.d/kubernetes.list
+    - name: Add Kubernetes repository
+      apt_repository:
+        repo: 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /'
+        state: present
+        filename: kubernetes
 
-    - name: Update apt package list
+    - name: Update apt cache
       apt:
         update_cache: yes
 
