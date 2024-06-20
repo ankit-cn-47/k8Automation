@@ -32,7 +32,13 @@
     - name: Change ownership of kubeconfig
       command: sudo chown {{ ansible_user }}:{{ ansible_user }} /home/{{ ansible_user }}/.kube/config
       become: true
+    
+    - name: Download Calico YAML
+      get_url:
+        url: https://raw.githubusercontent.com/projectcalico/calico/v3.28.0/manifests/calico.yaml
+        dest: /home/{{ ansible_user }}/calico.yaml
+      become: false
 
     - name: Apply Calico network
-      command: kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.28.0/manifests/tigera-operator.yaml
+      command: kubectl apply -f /home/{{ ansible_user }}/calico.yaml
       become: false
