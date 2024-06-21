@@ -15,7 +15,7 @@
         - "$HOME/.kube"
 
     - name: Initialize Kubernetes cluster
-      command: kubeadm init --kubernetes-version v1.29.1 --apiserver-advertise-address={{default_gateway}}
+      command: kubeadm init --kubernetes-version v1.29.1 --apiserver-advertise-address={{default_gateway}} --pod-network-cidr=10.10.0/0/16 --control-plane-endpoint=master.kubernetes.cluster
 
     - name: Create a .kube directory for user
       file:
@@ -33,12 +33,12 @@
       command: sudo chown {{ ansible_user }}:{{ ansible_user }} /home/{{ ansible_user }}/.kube/config
       become: true
     
-    - name: Download Calico YAML
-      get_url:
-        url: https://raw.githubusercontent.com/projectcalico/calico/v3.28.0/manifests/calico.yaml
-        dest: /home/{{ ansible_user }}/calico.yaml
-      become: false
+    # - name: Download Calico YAML
+    #   get_url:
+    #     url: https://raw.githubusercontent.com/projectcalico/calico/v3.28.0/manifests/calico.yaml
+    #     dest: /home/{{ ansible_user }}/calico.yaml
+    #   become: false
 
-    - name: Apply Calico network
-      command: kubectl apply -f /home/{{ ansible_user }}/calico.yaml
-      become: false
+    # - name: Apply Calico network
+    #   command: kubectl apply -f /home/{{ ansible_user }}/calico.yaml
+    #   become: false
