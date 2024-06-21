@@ -15,7 +15,7 @@
         - "$HOME/.kube"
 
     - name: Initialize Kubernetes cluster
-      command: kubeadm init --kubernetes-version v1.29.1 --apiserver-advertise-address={{default_gateway}} --pod-network-cidr=10.10.0/0/16 --control-plane-endpoint=master.kubernetes.cluster
+      command: kubeadm init --kubernetes-version v1.29.1 --apiserver-advertise-address={{default_gateway}} --pod-network-cidr=10.10.0.0/16 --control-plane-endpoint=master.kubernetes.cluster
 
     - name: Create a .kube directory for user
       file:
