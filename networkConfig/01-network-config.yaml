@@ -10,7 +10,6 @@ network:
       nameservers:
         addresses: #Below I chose to use google as the DNS servers. You can choose other DNS servers if you'd like.
           - 8.8.8.8
-          - 8.8.4.4
     enp0s8: #This is your network adapter attached to Host-only
       dhcp4: no
       addresses:
