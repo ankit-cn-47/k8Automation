@@ -1,5 +1,5 @@
 ---
-- name: Update, upgrade packages, install Git, and configure static IPs
+- name: Update, upgrade packages, install Git, Python 3, and configure static IPs
   hosts: all_servers
   become: yes
 
@@ -38,6 +38,19 @@
         name: git
         state: present
 
+    - name: Install Python 3
+      apt:
+        name: python3
+        state: present
+
+    - name: Set alias for Python 3
+      lineinfile:
+        path: /etc/profile.d/python_alias.sh
+        create: yes
+        line: "alias python=python3"
+        state: present
+      notify: Reload profile
+
     - name: Configure static IPs with netplan
       copy:
         dest: /etc/netplan/01-netcfg.yaml
@@ -57,3 +70,7 @@
   handlers:
     - name: Apply netplan configuration
       command: netplan apply
+
+    - name: Reload profile
+      command: source /etc/profile.d/python_alias.sh
+      when: ansible_distribution != 'Alpine'  # Reload only for compatible distributions
