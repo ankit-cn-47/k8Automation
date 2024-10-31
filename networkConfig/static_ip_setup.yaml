@@ -1,0 +1,59 @@
+---
+- name: Update, upgrade packages, install Git, and configure static IPs
+  hosts: all_servers
+  become: yes
+
+  vars:
+    common_interface: "eth0"      # Common interface for all servers
+    common_gateway: "10.0.2.254"  # Common gateway for all servers
+    common_dns:                   # Common DNS for all servers
+      - "8.8.8.8"
+      - "8.8.4.4"
+    ip_range:
+      - "10.0.2.1/24"
+      - "10.0.2.2/24"
+      - "10.0.2.3/24"
+      - "10.0.2.4/24"
+      - "10.0.2.5/24"
+      - "10.0.2.6/24"
+
+  tasks:
+    - name: Update and upgrade packages
+      apt:
+        update_cache: yes
+        upgrade: dist
+
+    - name: Install net-tools
+      apt:
+        name: net-tools
+        state: present
+
+    - name: Install netplan
+      apt:
+        name: netplan.io
+        state: present
+
+    - name: Install Git
+      apt:
+        name: git
+        state: present
+
+    - name: Configure static IPs with netplan
+      copy:
+        dest: /etc/netplan/01-netcfg.yaml
+        content: |
+          network:
+            version: 2
+            ethernets:
+              {{ common_interface }}:
+                dhcp4: false
+                addresses:
+                  - "{{ ip_range[play_hosts.index(inventory_hostname)] }}"
+                gateway4: "{{ common_gateway }}"
+                nameservers:
+                  addresses: {{ common_dns }}
+      notify: Apply netplan configuration
+
+  handlers:
+    - name: Apply netplan configuration
+      command: netplan apply
